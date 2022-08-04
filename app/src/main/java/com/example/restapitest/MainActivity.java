@@ -32,7 +32,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
     private TextView tv;
     List<TodoModel> todoModelList;
     Token token;
@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     UserClient userClient;
     public static String str;
     ProgressBar spinner;
+    RecyclerView recyclerView;
+
 
     SharedPreferences sharedPreferences ;
 
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listView = findViewById(R.id.lv);
+        recyclerView = findViewById(R.id.lv);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -65,17 +67,17 @@ public class MainActivity extends AppCompatActivity {
 
         sharedPreferences = getApplicationContext().getSharedPreferences("MySharedPref", MODE_PRIVATE);
         str=sharedPreferences.getString("tk","");
-        listView.setClickable(true);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent=new Intent(MainActivity.this,updateTask.class);
-                intent.putExtra("id",Integer.toString(todoModelList.get(i).getId()));
-                intent.putExtra("title",todoModelList.get(i).getTitle());
-                startActivity(intent);
-                MainActivity.this.finish();
-            }
-        });
+//        listView.setClickable(true);
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                Intent intent=new Intent(MainActivity.this,updateTask.class);
+//                intent.putExtra("id",Integer.toString(todoModelList.get(i).getId()));
+//                intent.putExtra("title",todoModelList.get(i).getTitle());
+//                startActivity(intent);
+//                MainActivity.this.finish();
+//            }
+//        });
 
         getList();
 
@@ -120,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     Toast.makeText(MainActivity.this, "not successful", Toast.LENGTH_SHORT).show();
+
                 }
             }
 
@@ -134,8 +137,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void createList() {
-        RituAdapter adapter = new RituAdapter(this, todoModelList);
-        listView.setAdapter(adapter);
+        List<TodoListCopy> todoListCopyList=new ArrayList<>();
+        for(TodoModel todoModel:todoModelList){
+            TodoListCopy todoListCopy=new TodoListCopy();
+            todoListCopy.setExpanded(false);
+            todoListCopy.setTitle(todoModel.getTitle());
+            todoListCopy.setId(todoModel.getId());
+            todoListCopyList.add(todoListCopy);
+        }
+        RituAdapter adapter = new RituAdapter(this, todoListCopyList,this);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         Log.d("damn","ok");
     }
 
@@ -171,5 +183,46 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+    @Override
+    public void onDelete(int position) {
+
+            Call<ResponseBody> call=userClient.deleteTodo(Integer.parseInt(String.valueOf(todoModelList.get(position).getId())),"Token " + str);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if(response.isSuccessful()){
+                        Toast.makeText(MainActivity.this, "TASK DELETED", Toast.LENGTH_SHORT).show();
+                        restartActivity();
+
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, "not successful", Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+    private void restartActivity() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
+
+    @Override
+    public void onEdit(int position) {
+        Intent intent=new Intent(MainActivity.this,updateTask.class);
+        intent.putExtra("id",Integer.toString(todoModelList.get(position).getId()));
+        intent.putExtra("title",todoModelList.get(position).getTitle());
+        startActivity(intent);
+        MainActivity.this.finish();
+    }
 }
 

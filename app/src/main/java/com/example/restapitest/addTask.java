@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import okhttp3.OkHttpClient;
@@ -27,6 +28,7 @@ public class addTask extends AppCompatActivity {
     public static String str;
     Button bt_add;
     EditText et_task;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,8 @@ public class addTask extends AppCompatActivity {
                 .client(okHttpClient)
                 .build();
         userClient = retrofit.create(UserClient.class);
+        progressBar=findViewById(R.id.progress_circular2);
+        progressBar.setVisibility(View.GONE);
 
         sharedPreferences = getApplicationContext().getSharedPreferences("MySharedPref", MODE_PRIVATE);
         str=sharedPreferences.getString("tk","");
@@ -59,6 +63,7 @@ public class addTask extends AppCompatActivity {
                 else{
                     createPost(et_task.getText().toString());
                     bt_add.setEnabled(false);
+                    progressBar.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -78,6 +83,9 @@ public class addTask extends AppCompatActivity {
                     Toast.makeText(addTask.this, "not successful", Toast.LENGTH_SHORT).show();
                     bt_add=findViewById(R.id.bt_add);
                     bt_add.setEnabled(true);
+                    progressBar=findViewById(R.id.progress_circular2);
+                    progressBar.setVisibility(View.GONE);
+
                 }
             }
 
@@ -86,6 +94,8 @@ public class addTask extends AppCompatActivity {
                 Toast.makeText(addTask.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                 bt_add=findViewById(R.id.bt_add);
                 bt_add.setEnabled(true);
+                progressBar=findViewById(R.id.progress_circular2);
+                progressBar.setVisibility(View.GONE);
             }
         });
 

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -54,7 +55,7 @@ public class RegisterActivity extends AppCompatActivity {
                 .client(okHttpClient)
                 .build();
         userClient = retrofit.create(UserClient.class);
-
+        sharedPreferences= getSharedPreferences("MySharedPref",MODE_PRIVATE);
         progressBar=findViewById(R.id.spinner2);
         progressBar.setVisibility(View.GONE);
         signupbt.setOnClickListener(new View.OnClickListener() {
@@ -82,6 +83,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void register() {
         RegisterModel registerModel = new RegisterModel(et_name.getText().toString(), et_email.getText().toString(), et_username.getText().toString(), et_password.getText().toString());
+        Log.d("ritulog3",registerModel.getName()+" "+registerModel.getEmail()+" "+registerModel.getUsername()+" "+registerModel.getPassword());
 
         Call<Token> call = userClient.registerProfile(registerModel);
         call.enqueue(new Callback<Token>() {
@@ -89,12 +91,14 @@ public class RegisterActivity extends AppCompatActivity {
             public void onResponse(Call<Token> call, Response<Token> response) {
                 if (response.isSuccessful()) {
                     token = response.body();
-//                    Toast.makeText(RegisterActivity.this, token.getToken(), Toast.LENGTH_SHORT).show();
-                    openActivity();
-
+                    Log.d("rituprint", token.getToken());
+                    Toast.makeText(RegisterActivity.this, token.getToken(), Toast.LENGTH_SHORT).show();
                     SharedPreferences.Editor myEdit = sharedPreferences.edit();
                     myEdit.putString("tk", token.getToken());
                     myEdit.apply();
+                    openActivity();
+
+
                 } else {
                     Toast.makeText(RegisterActivity.this, "invalid input", Toast.LENGTH_SHORT).show();
                     signupbt = findViewById(R.id.signupbt);

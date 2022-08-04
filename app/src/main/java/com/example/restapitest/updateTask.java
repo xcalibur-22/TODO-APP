@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import okhttp3.OkHttpClient;
@@ -27,6 +28,7 @@ public class updateTask extends AppCompatActivity {
     EditText et_task2;
     Button bt_update;
     Button bt_delete;
+    ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +37,8 @@ public class updateTask extends AppCompatActivity {
         et_task2=findViewById(R.id.et_task2);
         bt_update=findViewById(R.id.bt_update);
         bt_delete=findViewById(R.id.bt_delete);
-
+        progressBar=findViewById(R.id.progress_circular1);
+        progressBar.setVisibility(View.GONE);
 
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -66,6 +69,7 @@ public class updateTask extends AppCompatActivity {
                     updatePost(x,et_task2.getText().toString());
                     bt_update.setEnabled(false);
                     bt_delete.setEnabled(false);
+                    progressBar.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -75,6 +79,7 @@ public class updateTask extends AppCompatActivity {
                 deletePost(x);
                 bt_update.setEnabled(false);
                 bt_delete.setEnabled(false);
+                progressBar.setVisibility(View.VISIBLE);
             }
         });
 
@@ -97,6 +102,8 @@ public class updateTask extends AppCompatActivity {
                     bt_delete=findViewById(R.id.bt_delete);
                     bt_update.setEnabled(true);
                     bt_delete.setEnabled(true);
+                    progressBar=findViewById(R.id.progress_circular1);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
 
@@ -107,6 +114,8 @@ public class updateTask extends AppCompatActivity {
                 bt_delete=findViewById(R.id.bt_delete);
                 bt_update.setEnabled(true);
                 bt_delete.setEnabled(true);
+                progressBar=findViewById(R.id.progress_circular1);
+                progressBar.setVisibility(View.GONE);
             }
         });
 
@@ -128,6 +137,8 @@ public class updateTask extends AppCompatActivity {
                     bt_delete=findViewById(R.id.bt_delete);
                     bt_update.setEnabled(true);
                     bt_delete.setEnabled(true);
+                    progressBar=findViewById(R.id.progress_circular1);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
 
@@ -138,6 +149,8 @@ public class updateTask extends AppCompatActivity {
                 bt_delete=findViewById(R.id.bt_delete);
                 bt_update.setEnabled(true);
                 bt_delete.setEnabled(true);
+                progressBar=findViewById(R.id.progress_circular1);
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
